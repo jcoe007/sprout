@@ -100,6 +100,10 @@ export const App = () => {
   return (
     <div className="app">
       <header>
+        <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999, background: "yellow" }}>
+          CANARY-123
+        </div>
+
         <div>
           <h1>Sprout</h1>
           <p className="subtitle">Single Plant Grid Life-Sim MVP</p>
