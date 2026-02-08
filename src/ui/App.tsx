@@ -100,10 +100,6 @@ export const App = () => {
   return (
     <div className="app">
       <header>
-        <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999, background: "yellow" }}>
-          CANARY-123
-        </div>
-
         <div>
           <h1>Sprout</h1>
           <p className="subtitle">Single Plant Grid Life-Sim MVP</p>
@@ -178,6 +174,26 @@ export const App = () => {
 
         <section className="control-panel">
           <div className="stats">
+            <h2>How it works</h2>
+            <ul className="explain">
+              <li>
+                <strong>Leaves</strong> generate energy, but water and nutrients cap production.
+              </li>
+              <li>
+                <strong>Maintenance</strong> is paid first. Low energy means less growth.
+              </li>
+              <li>
+                <strong>Roots</strong> increase daily water/nutrient uptake and unlock new tiles.
+              </li>
+              <li>
+                <strong>Defense</strong> reduces pest damage with diminishing returns.
+              </li>
+              <li>
+                <strong>HP</strong> is vitality; drought and pests lower it toward zero.
+              </li>
+            </ul>
+          </div>
+          <div className="stats">
             <h2>Plant Stats</h2>
             <div className="stat-grid">
               <div>
@@ -211,6 +227,10 @@ export const App = () => {
               </p>
               <p>
                 Start values: LM {STARTING_STATS.leafMass}, RM {STARTING_STATS.rootMass}.
+              </p>
+              <p>
+                HP reflects overall vitality (drought + pests reduce it). Keep HP above zero to
+                survive.
               </p>
             </div>
           </div>
@@ -248,9 +268,29 @@ export const App = () => {
             {runState.lastStats ? (
               <ul>
                 <li>Energy: {formatNumber(runState.lastStats.energy)}</li>
+                <li>Maintenance: {formatNumber(runState.lastStats.maintenance)}</li>
+                <li>Net Energy: {formatNumber(runState.lastStats.netEnergy)}</li>
+                {runState.lastStats.netEnergy <= 0 ? (
+                  <li className="warning">Growth stalled: energy did not cover maintenance.</li>
+                ) : null}
                 <li>Water Factor: {formatNumber(runState.lastStats.waterFactor)}</li>
+                <li>
+                  Water: {formatNumber(runState.lastStats.waterUptake)} /{" "}
+                  {formatNumber(runState.lastStats.waterDemand)}
+                </li>
                 <li>Nutrient Factor: {formatNumber(runState.lastStats.nutrientFactor)}</li>
+                <li>
+                  Nutrients: {formatNumber(runState.lastStats.nutrientUptake)} /{" "}
+                  {formatNumber(runState.lastStats.nutrientDemand)}
+                </li>
                 <li>Pest Pressure: {formatNumber(runState.lastStats.pestPressure)}</li>
+                <li>Leaf Growth: +{formatNumber(runState.lastStats.leafGrowth)}</li>
+                <li>Leaf Loss: -{formatNumber(runState.lastStats.leafLoss)}</li>
+                <li>Net Leaf Change: {formatNumber(runState.lastStats.netLeafChange)}</li>
+                <li>Net Root Change: +{formatNumber(runState.lastStats.netRootChange)}</li>
+                <li>Net HP Change: {formatNumber(runState.lastStats.netHpChange)}</li>
+                <li>HP Loss (Drought): -{formatNumber(runState.lastStats.droughtDamage)}</li>
+                <li>HP Loss (Pests): -{formatNumber(runState.lastStats.pestHpDamage)}</li>
                 <li>Rain: {runState.lastStats.rainLabel}</li>
               </ul>
             ) : (

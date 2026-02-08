@@ -217,6 +217,18 @@ main {
   color: #cbd5f5;
 }
 
+.warning {
+  color: #fbbf24;
+}
+
+.explain {
+  margin: 0.6rem 0 0;
+  padding-left: 1.1rem;
+  color: #d1d5db;
+  display: grid;
+  gap: 0.4rem;
+}
+
 .journal ol {
   margin: 0.6rem 0 0;
   padding-left: 1.1rem;

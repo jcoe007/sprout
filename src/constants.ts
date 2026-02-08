@@ -26,19 +26,19 @@ export const RAIN = {
 export const RESOURCE = {
   waterPerTile: 1,
   nutrientPerTile: 1,
-  waterUptakePerRoot: 0.9,
-  nutrientUptakePerRoot: 0.7,
+  waterUptakePerRoot: 1.1,
+  nutrientUptakePerRoot: 0.9,
   baseWaterDemand: 0.4,
   baseNutrientDemand: 0.3,
-  demandPerLeaf: 0.3,
-  demandPerLeafN: 0.2,
+  demandPerLeaf: 0.25,
+  demandPerLeafN: 0.15,
 };
 
 export const ENERGY = {
-  basePhoto: 1.2,
-  leafMaint: 0.08,
-  rootMaint: 0.06,
-  defMaint: 0.04,
+  basePhoto: 1.8,
+  leafMaint: 0.04,
+  rootMaint: 0.04,
+  defMaint: 0.02,
   leafGrowRate: 0.9,
   rootGrowRate: 0.8,
   defGrowRate: 0.6,
@@ -47,13 +47,13 @@ export const ENERGY = {
 
 export const THREATS = {
   droughtThreshold: 0.6,
-  droughtDamageScale: 12,
+  droughtDamageScale: 10,
   pestBaseMax: 0.3,
   pestSpikeChance: 0.15,
   pestSpikeAmount: 0.7,
   defHalfSat: 5,
-  pestDamageRate: 0.35,
-  pestHpDamageRate: 8,
+  pestDamageRate: 0.15,
+  pestHpDamageRate: 4,
 };
 
 export const COZY_LINES = [
