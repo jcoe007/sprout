@@ -27,21 +27,8 @@ export type PlantState = {
 
 export type DayStats = {
   energy: number;
-  netEnergy: number;
-  maintenance: number;
   waterFactor: number;
   nutrientFactor: number;
-  waterUptake: number;
-  waterDemand: number;
-  nutrientUptake: number;
-  nutrientDemand: number;
-  leafGrowth: number;
-  rootGrowth: number;
-  defenseGrowth: number;
-  reproGrowth: number;
-  leafLoss: number;
-  droughtDamage: number;
-  pestHpDamage: number;
   pestPressure: number;
   rainLabel: string;
 };
@@ -308,15 +295,10 @@ export const stepDay = (
     nextState.plant.defense * ENERGY.defMaint;
   const netEnergy = Math.max(energy - maint, 0);
 
-  const leafGrowth = netEnergy * allocation.leaves * ENERGY.leafGrowRate;
-  const rootGrowth = netEnergy * allocation.roots * ENERGY.rootGrowRate;
-  const defenseGrowth = netEnergy * allocation.defense * ENERGY.defGrowRate;
-  const reproGrowth = netEnergy * allocation.repro * ENERGY.reproGrowRate;
-
-  nextState.plant.leafMass += leafGrowth;
-  nextState.plant.rootMass += rootGrowth;
-  nextState.plant.defense += defenseGrowth;
-  nextState.plant.repro += reproGrowth;
+  nextState.plant.leafMass += netEnergy * allocation.leaves * ENERGY.leafGrowRate;
+  nextState.plant.rootMass += netEnergy * allocation.roots * ENERGY.rootGrowRate;
+  nextState.plant.defense += netEnergy * allocation.defense * ENERGY.defGrowRate;
+  nextState.plant.repro += netEnergy * allocation.repro * ENERGY.reproGrowRate;
 
   const maxTilesAllowed = 1 + Math.floor(nextState.plant.rootMass / ROOT_MASS_PER_TILE);
   if (nextState.plant.rootTiles.size < maxTilesAllowed) {
@@ -326,10 +308,9 @@ export const stepDay = (
     }
   }
 
-  let droughtDamage = 0;
   if (waterFactor < THREATS.droughtThreshold) {
-    droughtDamage = (THREATS.droughtThreshold - waterFactor) * THREATS.droughtDamageScale;
-    nextState.plant.health = clamp(nextState.plant.health - droughtDamage, 0, 100);
+    const penalty = (THREATS.droughtThreshold - waterFactor) * THREATS.droughtDamageScale;
+    nextState.plant.health = clamp(nextState.plant.health - penalty, 0, 100);
   }
 
   let pestPressure = nextState.rng.next() * THREATS.pestBaseMax;
@@ -342,9 +323,9 @@ export const stepDay = (
   const leafLoss =
     nextState.plant.leafMass * pestPressure * THREATS.pestDamageRate * (1 - defEffect);
   nextState.plant.leafMass = Math.max(0, nextState.plant.leafMass - leafLoss);
-  const pestHpDamage = pestPressure * THREATS.pestHpDamageRate * (1 - defEffect);
   nextState.plant.health = clamp(
-    nextState.plant.health - pestHpDamage,
+    nextState.plant.health -
+      pestPressure * THREATS.pestHpDamageRate * (1 - defEffect),
     0,
     100,
   );
@@ -363,21 +344,8 @@ export const stepDay = (
   nextState.journal = [log, ...nextState.journal].slice(0, 10);
   nextState.lastStats = {
     energy: energy,
-    netEnergy,
-    maintenance: maint,
     waterFactor,
     nutrientFactor,
-    waterUptake,
-    waterDemand,
-    nutrientUptake,
-    nutrientDemand,
-    leafGrowth,
-    rootGrowth,
-    defenseGrowth,
-    reproGrowth,
-    leafLoss,
-    droughtDamage,
-    pestHpDamage,
     pestPressure,
     rainLabel: rain.label,
   };

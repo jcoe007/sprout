@@ -208,10 +208,6 @@ export const App = () => {
               <p>
                 Start values: LM {STARTING_STATS.leafMass}, RM {STARTING_STATS.rootMass}.
               </p>
-              <p>
-                HP reflects overall vitality (drought + pests reduce it). Keep HP above zero to
-                survive.
-              </p>
             </div>
           </div>
 
@@ -248,47 +244,14 @@ export const App = () => {
             {runState.lastStats ? (
               <ul>
                 <li>Energy: {formatNumber(runState.lastStats.energy)}</li>
-                <li>Maintenance: {formatNumber(runState.lastStats.maintenance)}</li>
-                <li>Net Energy: {formatNumber(runState.lastStats.netEnergy)}</li>
                 <li>Water Factor: {formatNumber(runState.lastStats.waterFactor)}</li>
-                <li>
-                  Water: {formatNumber(runState.lastStats.waterUptake)} /{" "}
-                  {formatNumber(runState.lastStats.waterDemand)}
-                </li>
                 <li>Nutrient Factor: {formatNumber(runState.lastStats.nutrientFactor)}</li>
-                <li>
-                  Nutrients: {formatNumber(runState.lastStats.nutrientUptake)} /{" "}
-                  {formatNumber(runState.lastStats.nutrientDemand)}
-                </li>
                 <li>Pest Pressure: {formatNumber(runState.lastStats.pestPressure)}</li>
-                <li>Leaf Growth: +{formatNumber(runState.lastStats.leafGrowth)}</li>
-                <li>Leaf Loss: -{formatNumber(runState.lastStats.leafLoss)}</li>
-                <li>HP Loss (Drought): -{formatNumber(runState.lastStats.droughtDamage)}</li>
-                <li>HP Loss (Pests): -{formatNumber(runState.lastStats.pestHpDamage)}</li>
                 <li>Rain: {runState.lastStats.rainLabel}</li>
               </ul>
             ) : (
               <p>Pick your sliders, then end the day.</p>
             )}
-          </div>
-
-          <div className="stats">
-            <h2>How the numbers interact</h2>
-            <ul className="explain">
-              <li>
-                Leaves make energy, but water and nutrients limit how much energy you get.
-              </li>
-              <li>
-                Maintenance costs are paid before growth. If energy is low, growth can stall.
-              </li>
-              <li>
-                Pests reduce leaf mass and HP; defense lowers their impact with diminishing
-                returns.
-              </li>
-              <li>
-                Drought hurts HP when water factor drops below the threshold in constants.
-              </li>
-            </ul>
           </div>
 
           <div className="journal">

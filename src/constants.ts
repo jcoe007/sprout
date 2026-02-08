@@ -47,13 +47,13 @@ export const ENERGY = {
 
 export const THREATS = {
   droughtThreshold: 0.6,
-  droughtDamageScale: 10,
+  droughtDamageScale: 12,
   pestBaseMax: 0.3,
   pestSpikeChance: 0.15,
   pestSpikeAmount: 0.7,
   defHalfSat: 5,
-  pestDamageRate: 0.2,
-  pestHpDamageRate: 5,
+  pestDamageRate: 0.35,
+  pestHpDamageRate: 8,
 };
 
 export const COZY_LINES = [
