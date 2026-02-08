@@ -35,10 +35,10 @@ export const RESOURCE = {
 };
 
 export const ENERGY = {
-  basePhoto: 1.5,
-  leafMaint: 0.06,
-  rootMaint: 0.05,
-  defMaint: 0.03,
+  basePhoto: 1.2,
+  leafMaint: 0.08,
+  rootMaint: 0.06,
+  defMaint: 0.04,
   leafGrowRate: 0.9,
   rootGrowRate: 0.8,
   defGrowRate: 0.6,
@@ -47,13 +47,13 @@ export const ENERGY = {
 
 export const THREATS = {
   droughtThreshold: 0.6,
-  droughtDamageScale: 10,
+  droughtDamageScale: 12,
   pestBaseMax: 0.3,
   pestSpikeChance: 0.15,
   pestSpikeAmount: 0.7,
   defHalfSat: 5,
-  pestDamageRate: 0.15,
-  pestHpDamageRate: 4,
+  pestDamageRate: 0.35,
+  pestHpDamageRate: 8,
 };
 
 export const COZY_LINES = [
