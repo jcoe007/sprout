@@ -7,6 +7,7 @@ import {
   REPRO_TARGET,
   RESOURCE,
   ROOT_MASS_PER_TILE,
+  SEED_RESERVES,
   STARTING_STATS,
   THREATS,
 } from "../constants";
@@ -23,6 +24,9 @@ export type PlantState = {
   health: number;
   rootTiles: Set<string>;
   leafZeroDays: number;
+  seedEnergy: number;
+  seedWater: number;
+  seedNutrients: number;
 };
 
 export type DayStats = {
@@ -35,6 +39,9 @@ export type DayStats = {
   waterDemand: number;
   nutrientUptake: number;
   nutrientDemand: number;
+  seedEnergyUsed: number;
+  seedWaterUsed: number;
+  seedNutrientsUsed: number;
   leafGrowth: number;
   netLeafChange: number;
   rootGrowth: number;
@@ -123,6 +130,9 @@ export const createInitialState = (seed = 1234): RunState => {
     health: STARTING_STATS.health,
     rootTiles: new Set([coordKey({ x: center, y: center })]),
     leafZeroDays: 0,
+    seedEnergy: SEED_RESERVES.energy,
+    seedWater: SEED_RESERVES.water,
+    seedNutrients: SEED_RESERVES.nutrients,
   };
 
   return {
@@ -284,21 +294,40 @@ export const stepDay = (
   const rain = rainForDay(nextState.rng);
   applyRain(nextState.world, rain.amount, rain.label === "Heavy rain");
 
-  const totals = computeTotals(nextState.world, nextState.plant.rootTiles);
-  const waterUptake = Math.min(
-    totals.waterAvailable,
-    nextState.plant.rootMass * RESOURCE.waterUptakePerRoot,
-  );
-  const nutrientUptake = Math.min(
-    totals.nutrientAvailable,
-    nextState.plant.rootMass * RESOURCE.nutrientUptakePerRoot,
-  );
-
-  depleteResources(nextState.world, nextState.plant.rootTiles, waterUptake, nutrientUptake, totals);
-
   const waterDemand = RESOURCE.baseWaterDemand + nextState.plant.leafMass * RESOURCE.demandPerLeaf;
   const nutrientDemand =
     RESOURCE.baseNutrientDemand + nextState.plant.leafMass * RESOURCE.demandPerLeafN;
+
+  const totals = computeTotals(nextState.world, nextState.plant.rootTiles);
+  const baseWaterUptake = Math.min(
+    totals.waterAvailable,
+    nextState.plant.rootMass * RESOURCE.waterUptakePerRoot,
+  );
+  const baseNutrientUptake = Math.min(
+    totals.nutrientAvailable,
+    nextState.plant.rootMass * RESOURCE.nutrientUptakePerRoot,
+  );
+  const seedWaterUsed = Math.min(
+    nextState.plant.seedWater,
+    Math.max(waterDemand - baseWaterUptake, 0),
+  );
+  const seedNutrientsUsed = Math.min(
+    nextState.plant.seedNutrients,
+    Math.max(nutrientDemand - baseNutrientUptake, 0),
+  );
+  nextState.plant.seedWater -= seedWaterUsed;
+  nextState.plant.seedNutrients -= seedNutrientsUsed;
+
+  const waterUptake = baseWaterUptake + seedWaterUsed;
+  const nutrientUptake = baseNutrientUptake + seedNutrientsUsed;
+
+  depleteResources(
+    nextState.world,
+    nextState.plant.rootTiles,
+    baseWaterUptake,
+    baseNutrientUptake,
+    totals,
+  );
 
   const waterFactor = clamp(waterUptake / waterDemand, 0, 1);
   const nutrientFactor = clamp(nutrientUptake / nutrientDemand, 0.2, 1);
@@ -309,7 +338,9 @@ export const stepDay = (
     nextState.plant.leafMass * ENERGY.leafMaint +
     nextState.plant.rootMass * ENERGY.rootMaint +
     nextState.plant.defense * ENERGY.defMaint;
-  const netEnergy = Math.max(energy - maint, 0);
+  const seedEnergyUsed = Math.min(nextState.plant.seedEnergy, Math.max(maint - energy, 0));
+  nextState.plant.seedEnergy -= seedEnergyUsed;
+  const netEnergy = Math.max(energy + seedEnergyUsed - maint, 0);
 
   const leafGrowth = netEnergy * allocation.leaves * ENERGY.leafGrowRate;
   const rootGrowth = netEnergy * allocation.roots * ENERGY.rootGrowRate;
@@ -375,6 +406,9 @@ export const stepDay = (
     waterDemand,
     nutrientUptake,
     nutrientDemand,
+    seedEnergyUsed,
+    seedWaterUsed,
+    seedNutrientsUsed,
     leafGrowth,
     netLeafChange: leafGrowth - leafLoss,
     rootGrowth,

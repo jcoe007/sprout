@@ -186,7 +186,7 @@ main {
 
 .slider-row {
   display: grid;
-  grid-template-columns: 1fr 2fr 60px;
+  grid-template-columns: 1fr 2fr 60px 80px;
   align-items: center;
   gap: 0.8rem;
   font-size: 0.9rem;
@@ -219,6 +219,14 @@ main {
 
 .warning {
   color: #fbbf24;
+}
+
+.lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #cbd5f5;
 }
 
 .explain {

@@ -43,31 +43,46 @@ export const App = () => {
     defense: 15,
     repro: 15,
   });
+  const [locks, setLocks] = useState({
+    leaves: false,
+    roots: false,
+    defense: false,
+    repro: false,
+  });
 
   const rootCoords = useMemo(() => serializeRootTiles(runState.plant.rootTiles), [runState]);
   const rootSet = runState.plant.rootTiles;
 
   const handleAllocationChange = (key: keyof typeof allocations, value: number) => {
-    const nextValue = clamp(value, 0, 100);
     const keys = Object.keys(allocations) as Array<keyof typeof allocations>;
-    const others = keys.filter((item) => item !== key);
-    const otherSum = others.reduce((sum, item) => sum + allocations[item], 0);
-    const remaining = 100 - nextValue;
+    const lockedKeys = keys.filter((item) => item !== key && locks[item]);
+    const unlockedKeys = keys.filter((item) => item !== key && !locks[item]);
+    const lockedSum = lockedKeys.reduce((sum, item) => sum + allocations[item], 0);
+    const maxAllowed = 100 - lockedSum;
+    const nextValue = clamp(value, 0, maxAllowed);
+    const remaining = 100 - nextValue - lockedSum;
     const next = { ...allocations, [key]: nextValue };
 
-    if (otherSum === 0) {
-      const split = Math.floor(remaining / others.length);
+    if (unlockedKeys.length === 0) {
+      setAllocations(next);
+      return;
+    }
+
+    const unlockedSum = unlockedKeys.reduce((sum, item) => sum + allocations[item], 0);
+
+    if (unlockedSum === 0) {
+      const split = Math.floor(remaining / unlockedKeys.length);
       let distributed = 0;
-      others.forEach((item, index) => {
-        const val = index === others.length - 1 ? remaining - distributed : split;
+      unlockedKeys.forEach((item, index) => {
+        const val = index === unlockedKeys.length - 1 ? remaining - distributed : split;
         distributed += val;
         next[item] = val;
       });
     } else {
       let distributed = 0;
-      others.forEach((item, index) => {
-        const raw = (allocations[item] / otherSum) * remaining;
-        const val = index === others.length - 1 ? remaining - distributed : Math.round(raw);
+      unlockedKeys.forEach((item, index) => {
+        const raw = (allocations[item] / unlockedSum) * remaining;
+        const val = index === unlockedKeys.length - 1 ? remaining - distributed : Math.round(raw);
         distributed += val;
         next[item] = val;
       });
@@ -191,6 +206,10 @@ export const App = () => {
               <li>
                 <strong>HP</strong> is vitality; drought and pests lower it toward zero.
               </li>
+              <li>
+                <strong>Seed reserves</strong> buffer early days with stored water, nutrients, and
+                energy.
+              </li>
             </ul>
           </div>
           <div className="stats">
@@ -255,6 +274,16 @@ export const App = () => {
                   }
                 />
                 <strong>{allocations[item.key]}%</strong>
+                <span className="lock">
+                  <input
+                    type="checkbox"
+                    checked={locks[item.key]}
+                    onChange={(event) =>
+                      setLocks((prev) => ({ ...prev, [item.key]: event.target.checked }))
+                    }
+                  />
+                  Lock
+                </span>
               </label>
             ))}
           </div>
@@ -282,6 +311,11 @@ export const App = () => {
                 <li>
                   Nutrients: {formatNumber(runState.lastStats.nutrientUptake)} /{" "}
                   {formatNumber(runState.lastStats.nutrientDemand)}
+                </li>
+                <li>
+                  Seed Boosts: +{formatNumber(runState.lastStats.seedWaterUsed)} water, +
+                  {formatNumber(runState.lastStats.seedNutrientsUsed)} nutrients, +
+                  {formatNumber(runState.lastStats.seedEnergyUsed)} energy
                 </li>
                 <li>Pest Pressure: {formatNumber(runState.lastStats.pestPressure)}</li>
                 <li>Leaf Growth: +{formatNumber(runState.lastStats.leafGrowth)}</li>

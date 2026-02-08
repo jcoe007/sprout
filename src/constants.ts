@@ -9,6 +9,12 @@ export const STARTING_STATS = {
   repro: 0,
 };
 
+export const SEED_RESERVES = {
+  energy: 0.8,
+  water: 0.6,
+  nutrients: 0.4,
+};
+
 export const REPRO_TARGET = 30;
 export const ROOT_MASS_PER_TILE = 2;
 
@@ -18,7 +24,7 @@ export const RAIN = {
   heavyChance: 0.05,
   lightAmount: 0.25,
   heavyAmount: 0.6,
-  evaporation: 0.08,
+  evaporation: 0.05,
   nutrientRegen: 0.005,
   heavyLeach: 0.02,
 };
